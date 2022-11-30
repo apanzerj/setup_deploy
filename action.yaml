@@ -1,0 +1,50 @@
+name: 'Setup Deployment'
+description: 'Set necessary meta information for a deployment'
+inputs:
+  GITHUB_EVENT_NAME:
+    description: 'Triggering event. `github.event_name`'
+    required: true
+  GITHUB_REF_NAME:
+    description: 'Ref name. `github.ref_name`'
+    required: true
+outputs:
+  CLUSTERS: # id of output
+    description: Which clusters to deploy to
+    value: ${{ steps.setup_push_to_main.outputs.CLUSTERS || steps.setup_push_to_prod.outputs.CLUSTERS || steps.setup_release.outputs.CLUSTERS || steps.setup_dispatch.outputs.CLUSTERS }}
+  TYPE:
+    description: The type of deploy
+    value: ${{ steps.setup_push_to_main.outputs.TYPE || steps.setup_push_to_prod.outputs.TYPE || steps.setup_release.outputs.TYPE || steps.setup_dispatch.outputs.TYPE }}
+runs:
+  using: composite
+  steps:
+    - name: Set Values (push to main)
+      shell: bash
+      id: setup_push_to_main
+      if: github.event_name == 'push' && github.ref_name == 'main'
+      run: |
+        echo "CLUSTERS=[\"bunny-staging-shard-01\"]"  >> $GITHUB_OUTPUT
+        echo "TYPE=deploy_to_staging" >> $GITHUB_OUTPUT
+
+    - name: Set Values (push to production)
+      shell: bash
+      if: github.event_name == 'push' && github.ref_name == 'production'
+      id: setup_push_to_prod
+      run: |
+        echo "CLUSTERS=[\"bunny-production-shard-02\"]" >> $GITHUB_OUTPUT
+        echo "TYPE=deploy_to_preprod" >> $GITHUB_OUTPUT
+
+    - name: Set Values (release published)
+      shell: bash
+      if: github.event_name == 'release'
+      id: setup_release
+      run: |
+        echo "CLUSTERS=[\"bunny-production-shard-01\"]" >> $GITHUB_OUTPUT
+        echo "TYPE=deploy_to_prod" >> $GITHUB_OUTPUT
+
+    - name: Set Values (workflow dispatch)
+      shell: bash
+      if: github.event_name == 'workflow_dispatch'
+      id: setup_dispatch
+      run: |
+        echo "CLUSTERS=[\"${{ github.event.inputs.cluster }}\"]" >> $GITHUB_OUTPUT
+        echo "TYPE=manual_trigger" >> $GITHUB_OUTPUT
