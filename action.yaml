@@ -27,7 +27,7 @@ runs:
       run: |
         echo "CLUSTERS=[\"bunny-staging-shard-01\",\"bunny-staging-shard-02\"]"  >> $GITHUB_OUTPUT
         echo "TYPE=deploy_to_staging" >> $GITHUB_OUTPUT
-        echo "NICE_TYPE='Deploy to Staging'" >> $GITHUB_OUTPUT
+        echo "NICE_TYPE=Deploy to Staging" >> $GITHUB_OUTPUT
 
     - name: Set Values (push to production)
       shell: bash
@@ -36,7 +36,7 @@ runs:
       run: |
         echo "CLUSTERS=[\"bunny-production-shard-02\"]" >> $GITHUB_OUTPUT
         echo "TYPE=deploy_to_preprod" >> $GITHUB_OUTPUT
-        echo "NICE_TYPE='Deploy to Preproduction'" >> $GITHUB_OUTPUT
+        echo "NICE_TYPE=Deploy to Preproduction" >> $GITHUB_OUTPUT
 
     - name: Set Values (release published)
       shell: bash
@@ -45,7 +45,7 @@ runs:
       run: |
         echo "CLUSTERS=[\"bunny-production-shard-01\"]" >> $GITHUB_OUTPUT
         echo "TYPE=deploy_to_prod" >> $GITHUB_OUTPUT
-        echo "NICE_TYPE='Deploy to Production'" >> $GITHUB_OUTPUT
+        echo "NICE_TYPE=Deploy to Production" >> $GITHUB_OUTPUT
 
     - name: Set Values (workflow dispatch)
       shell: bash
@@ -54,4 +54,4 @@ runs:
       run: |
         echo "CLUSTERS=[\"${{ github.event.inputs.cluster }}\"]" >> $GITHUB_OUTPUT
         echo "TYPE=manual_trigger" >> $GITHUB_OUTPUT
-        echo "NICE_TYPE='Manual Deploy'" >> $GITHUB_OUTPUT
+        echo "NICE_TYPE=Manual Deploy" >> $GITHUB_OUTPUT
